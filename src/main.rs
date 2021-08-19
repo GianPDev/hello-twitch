@@ -25,7 +25,7 @@ pub async fn main() {
     }
   });
   
-  client.join(channelName.to_owned());
+  client.join(channel_name.to_owned());
 
   join_handle.await.unwrap();
 }
