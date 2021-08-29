@@ -25,7 +25,11 @@ pub async fn main() {
   let bot_name_str = Cow::from(String::from("zowlbot").to_lowercase()); //Change to reading from a file or UI Input
   // let bot_name = &bot_name_str;
   let oauth_token_str = env::var("TWITCH_OAUTH").unwrap().to_string();
-  let channel_name_str = Arc::new(String::from("devizowl").to_lowercase());
+  // let channel_name_str = Arc::new(String::from("devizowl").to_lowercase());
+  let mut channels: Vec<String> = vec![String::new(); 1];
+  channels[0] = "devizowl".to_string();
+  // channels[1] = "zowlbot".to_string();
+  channels.push("zowlbot".to_string());
   // let channel_name = channel_name_str;
   // let bot_name = bot_name_str;
   // println!("S:{}, W:{}", Arc::strong_count(&bot_name_str), Arc::weak_count(&bot_name_str));
@@ -35,7 +39,11 @@ pub async fn main() {
   
   let (mut incoming_messages, client) = 
     TwitchIRCClient::<SecureTCPTransport, StaticLoginCredentials>::new(config); 
-  client.join(format!("{}", channel_name_str));
+  
+  for channel in &channels {
+    client.join(format!("{}", channel));  
+  }
+  //client.join(format!("{}", channel_name_str));
   
   let join_handle = tokio::spawn(async move {
     while let Some(message) = incoming_messages.recv().await {
@@ -50,6 +58,7 @@ pub async fn main() {
           // let bot_name = login_name.to_lowercase().to_string();
           // let bot_name = &bot_name_str;
           // println!("botname: {}", bot_name);
+          //enable whispering to bot for replies
           if !sender.to_lowercase().eq(&bot_name_str.to_string()) {
             // let chat_message = text.clone();
 
@@ -91,12 +100,13 @@ pub async fn main() {
                     e.kanji_elements().any(|k| k.text == value)
                   });
                   //TODO: try and get multiple glosses
+                  //should maybe error handle the entry unwrapping
                   let reading_form = match entry {
                     Some(ent) => format!("{}「{}」- {} [for {}]", value, ent.reading_elements().next().unwrap().text, ent.senses().next().unwrap().glosses().next().unwrap().text, sender),
                     None => format!("Cannot find「{}」[for {}]", value, sender),
                   };
                   println!("[{:02}:{:02}]{}", hour, now.minute(), reading_form);
-                  client.send_message(twitch_irc::message::IRCMessage::new_simple("PRIVMSG".to_string(), vec![format!("#{}", &channel_name_str), reading_form.to_string()])).await.unwrap();
+                  client.send_message(twitch_irc::message::IRCMessage::new_simple("PRIVMSG".to_string(), vec![format!("#{}", msg.channel_login), reading_form.to_string()])).await.unwrap();
                 }
                 _ => {println!("Invalid Command"); }
               }
@@ -112,7 +122,7 @@ pub async fn main() {
             if text.contains("monkaS")  {
               println!("monkaS detected");
               println!("{} @{}?", reply, sender);
-              client.send_message(twitch_irc::message::IRCMessage::new_simple("PRIVMSG".to_string(), vec![format!("#{}", &channel_name_str), reply])).await.unwrap();
+              client.send_message(twitch_irc::message::IRCMessage::new_simple("PRIVMSG".to_string(), vec![format!("#{}", msg.channel_login), reply])).await.unwrap();
             }
           }
        },
