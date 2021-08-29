@@ -44,7 +44,7 @@ pub async fn main() {
           let now = Utc::now();
           let(_is_pm, hour) = now.hour12();
           println!("[{:02}:{:02}](#{}) {}: {}", hour, now.minute(), msg.channel_login, msg.sender.name, msg.message_text);
-          let mut text = msg.message_text;
+          let text = msg.message_text;
           let sender = msg.sender.name;
           let reply = format!("Are you scared >>>{}<<<? :)", sender.to_string());
           // let bot_name = login_name.to_lowercase().to_string();
@@ -69,16 +69,35 @@ pub async fn main() {
               for s in text.split_whitespace() {
                 match s
                 {
-                  _ if command != "" => {println!("value: {}", s); value.push_str(" "); value.push_str(s);}
-                  _ if s.contains("!") => {println!("[{}] Command", s); command = s.to_string()},
-                  _ => println!("No cmd found|O: {}", s),
+                  _ if s.to_lowercase().contains(&bot_name_str.to_string()) => {println!("{} found", s)}
+                  _ if command != "" => {
+                    // println!("value: {}", s); 
+                    if value != "" { 
+                      value.push_str(" ");
+                    } 
+                    value.push_str(s);
+                  }
+                  _ if s.contains("!") => {/*println!("[{}] Command", s); */ command = s.to_string()},
+                  _ => println!("No cmd found ({})", s),
                   // &bot_name_str.to_string() => println!("{} found ", &bot_name_str.to_string()),
                   // _ => println!(""),
                 }
               }
               println!("FullCMD: {} {}", command, value);
               match command.as_str() {
-                "!jpd" | "!JPD" => {println!("Do dictionary search with: {}", value);}
+                "!jpd" | "!JPD" => {
+                  println!("Do dictionary search with: {}", value);
+                  let entry = jmdict::entries().find(|e| {
+                    e.kanji_elements().any(|k| k.text == value)
+                  });
+                  //TODO: try and get multiple glosses
+                  let reading_form = match entry {
+                    Some(ent) => format!("{}「{}」- {} [for {}]", value, ent.reading_elements().next().unwrap().text, ent.senses().next().unwrap().glosses().next().unwrap().text, sender),
+                    None => format!("Cannot find「{}」[for {}]", value, sender),
+                  };
+                  println!("[{:02}:{:02}]{}", hour, now.minute(), reading_form);
+                  client.send_message(twitch_irc::message::IRCMessage::new_simple("PRIVMSG".to_string(), vec![format!("#{}", &channel_name_str), reading_form.to_string()])).await.unwrap();
+                }
                 _ => {println!("Invalid Command"); }
               }
               //Do command
