@@ -1,2 +1,6 @@
 /target
+<<<<<<< HEAD
 *.env*
+=======
+.env
+>>>>>>> f8adf0b75c124b09edabcd3aeadff871c020dfd5
