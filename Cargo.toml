@@ -11,3 +11,5 @@ tokio = { version = "1.10.0", features = ["full"] }
 chrono = "0.4"
 dotenv = "0.15.0"
 jmdict = "2.0.0"
+libretranslate = "0.5.1"
+jisho = "0.1.3"
