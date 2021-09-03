@@ -30,6 +30,7 @@ pub async fn main() {
   channels[0] = "devizowl".to_string();
   // channels[1] = "zowlbot".to_string();
   channels.push("zowlbot".to_string());
+  // channels.push("zowlbot".to_stringribenchi
   // let channel_name = channel_name_str;
   // let bot_name = bot_name_str;
   // println!("S:{}, W:{}", Arc::strong_count(&bot_name_str), Arc::weak_count(&bot_name_str));
@@ -101,10 +102,34 @@ pub async fn main() {
                   });
                   //TODO: try and get multiple glosses
                   //should maybe error handle the entry unwrapping
-                  let reading_form = match entry {
-                    Some(ent) => format!("{}「{}」- {} [for {}]", value, ent.reading_elements().next().unwrap().text, ent.senses().next().unwrap().glosses().next().unwrap().text, sender),
-                    None => format!("Cannot find「{}」[for {}]", value, sender),
-                  };
+                  // let reading_form = match entry {
+                  //   Some(ent) => {format!("{}「{}」- {} [for {}]", value, ent.reading_elements().next().unwrap().text, ent.senses().next().unwrap().glosses().next().unwrap().text, sender)},
+                  //   None => format!("Cannot find「{}」[for {}]", value, sender),
+                  // };
+                  
+                  let mut reading_form = String::from(value);
+
+                  for item in entry {
+                    for read_element in item.reading_elements()
+                    {
+                      reading_form.push_str("「");
+                      reading_form.push_str(read_element.text);
+                      reading_form.push_str("」>>");
+                    }
+                    for sense in item.senses()
+                    {
+                      for gloss in sense.glosses()
+                      {
+                        reading_form.push_str(" | ");
+                        reading_form.push_str(gloss.text);
+                      }
+                    }
+                  }
+
+                  reading_form.push_str(" | << [for ");
+                  reading_form.push_str(sender.as_str());
+                  reading_form.push_str("]");
+                
                   println!("[{:02}:{:02}]{}", hour, now.minute(), reading_form);
                   client.send_message(twitch_irc::message::IRCMessage::new_simple("PRIVMSG".to_string(), vec![format!("#{}", msg.channel_login), reading_form.to_string()])).await.unwrap();
                 }
