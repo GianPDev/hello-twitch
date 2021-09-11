@@ -34,6 +34,7 @@ pub async fn main() {
   channels[0] = "devizowl".to_string();
   // channels[1] = "zowlbot".to_string();
   channels.push("zowlbot".to_string());
+  // channels.push("ribenchi".to_string());
   // channels.push("zowlbot".to_stringribenchi
   // let channel_name = channel_name_str;
   // let bot_name = bot_name_str;
@@ -133,6 +134,11 @@ pub async fn main() {
                   reading_form.push_str(" | << [for ");
                   reading_form.push_str(sender.as_str());
                   reading_form.push_str("]");
+                  
+                  if reading_form.len() > 500 {
+                    let slice = &reading_form[0..499];
+                    reading_form = slice.to_string(); 
+                  }
                 
                   println!("[{:02}:{:02}]{}", hour, now.minute(), reading_form);
                   client.send_message(twitch_irc::message::IRCMessage::new_simple("PRIVMSG".to_string(), vec![format!("#{}", msg.channel_login), reading_form.to_string()])).await.unwrap();
@@ -142,10 +148,10 @@ pub async fn main() {
                 //thread 'tokio-runtime-worker' panicked at 'called `Result::unwrap()` on an `Err` value: RelativeUrlWithoutBase', C:\Users\TFI3080\.cargo\registry\src\github.com-1ecc6299db9ec823\surf-2.3.1\src\one_off.rs:131:36
                 // note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
                 // thread 'main' panicked at 'called `Result::unwrap()` on an `Err` value: JoinError::Panic(...)', src\main.rs:241:21
-                /* "!lt" | "!LT" => {
+                "!lt" | "!LT" => {
                   println!("Do libretranslate with: {}", value);
                   let data = translate_url(Language::Detect, target_lang, value, translation_server.to_string(), None).await;
-                  if data.is_ok() {
+                  /* if data.is_ok() {
                     let ok_data = data.unwrap();
                     println!("LT: {} | {}", ok_data.target.as_pretty(), ok_data.output);
                   }
@@ -153,14 +159,14 @@ pub async fn main() {
                     let err = data.err().unwrap();
                     println!("err {}", err);
                     // println!("LT: {} | {}", data.target.as_pretty(), data.output);
-                  }
-                  // let output = match data {
-                  //   Ok(v) => {println("{}", v)},
-                  //   Err(e) => {println!("{}", e)},
-                  // }
+                  } */
+                  let translation_output = match data {
+                    Ok(v) => {println!("{}", v.output.to_string())},
+                    Err(e) => {println!("{}", e)},
+                  };
                   // println!("LT: {} | {}", data.target.as_pretty(), data.output);
                 } //end of !lt
- */
+
                 "!jisho" | "!Jisho" => {
                   let entries = lookup(value.as_str());
                   let mut reading_form = String::from(&value);
@@ -181,6 +187,11 @@ pub async fn main() {
 
                   //split the string into parts so that it can paste the whole meaning
                   //get length if certain length substrin and send twice with delay
+                  if reading_form.len() > 500 {
+                    let slice = &reading_form[0..499];
+                    reading_form = slice.to_string(); 
+                  }
+                  
                   println!("({})Jisho: {} | << [for {}]", reading_form.len(),reading_form, sender);
                   //this was for when the string goes over 50 lines which is the limit for non mods
                   // let str_length = reading_form.len();
