@@ -12,7 +12,7 @@ use twitch_irc::message::{IRCMessage, ServerMessage};
 use chrono::{Datelike, Timelike, Utc};
 use std::sync::Arc;
 use std::borrow::Cow;
-use libretranslate::{translate_url, Language};
+//use libretranslate::{translate_url, Language};
 use jisho::lookup;
 
 //TODO use std::in for entering botname and multiple channels, then parse multiple channel joining, using substrings and do a for loop on all of the channel names
@@ -20,7 +20,7 @@ use jisho::lookup;
 #[tokio::main]
 pub async fn main() {
   dotenv().ok();
-  let target_lang = Language::English;
+  //let target_lang = Language::English;
   //let now = Utc::now();
   //let(is_pm, hour) = now.hour12();
   // let bot_name_str = Arc::new(String::from("zowlbot").to_lowercase()); //Change to reading from a file or UI Input
@@ -28,13 +28,17 @@ pub async fn main() {
   let bot_name_str = Cow::from(String::from("zowlbot").to_lowercase()); //Change to reading from a file or UI Input
   // let bot_name = &bot_name_str;
   let oauth_token_str = env::var("TWITCH_OAUTH").unwrap().to_string();
-  let translation_server = Cow::from(String::from(env::var("TRANSLATE_SERVER").unwrap()));
+  //let translation_server = Cow::from(String::from(env::var("TRANSLATE_SERVER").unwrap()));
   // let channel_name_str = Arc::new(String::from("devizowl").to_lowercase());
   let mut channels: Vec<String> = vec![String::new(); 1];
   channels[0] = "devizowl".to_string();
   // channels[1] = "zowlbot".to_string();
   channels.push("zowlbot".to_string());
-  // channels.push("ribenchi".to_string());
+  channels.push("ribenchi".to_string());
+  channels.push("xneoncroissant".to_string());
+  channels.push("yunatonayu".to_string());
+  channels.push("kimithekat".to_string());
+  channels.push("poppoko_nanachan".to_string());
   // channels.push("zowlbot".to_stringribenchi
   // let channel_name = channel_name_str;
   // let bot_name = bot_name_str;
@@ -148,7 +152,7 @@ pub async fn main() {
                 //thread 'tokio-runtime-worker' panicked at 'called `Result::unwrap()` on an `Err` value: RelativeUrlWithoutBase', C:\Users\TFI3080\.cargo\registry\src\github.com-1ecc6299db9ec823\surf-2.3.1\src\one_off.rs:131:36
                 // note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
                 // thread 'main' panicked at 'called `Result::unwrap()` on an `Err` value: JoinError::Panic(...)', src\main.rs:241:21
-                "!lt" | "!LT" => {
+                /*"!lt" | "!LT" => {
                   println!("Do libretranslate with: {}", value);
                   let data = translate_url(Language::Detect, target_lang, value, translation_server.to_string(), None).await;
                   /* if data.is_ok() {
@@ -165,7 +169,7 @@ pub async fn main() {
                     Err(e) => {println!("{}", e)},
                   };
                   // println!("LT: {} | {}", data.target.as_pretty(), data.output);
-                } //end of !lt
+                } //end of !lt */
 
                 "!jisho" | "!Jisho" => {
                   let entries = lookup(value.as_str());
